@@ -8,7 +8,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
-public class MainPage extends Page{
+public class MainPage extends Page {
 
     @FindBy(xpath = "//input[@class=\"l-page-title__input\"]")
     WebElement careerFormInput;

@@ -13,7 +13,6 @@ import java.util.List;
 
 public class VacanciesPage extends Page {
 
-
     @FindBy(xpath = "//span[@class=\"text-input text-input--withIcon\"]/input[@placeholder=\"Поиск\"]")
     WebElement jobFormInput;
 
@@ -66,6 +65,25 @@ public class VacanciesPage extends Page {
     @FindBy(xpath = "//button[@class=\"button-comp button-comp--appearance-primary button-comp--size-l\"]")
     WebElement specFilterSubmitButton;
 
+    @FindBy(xpath = "//button[@class=\"button-comp button-comp--appearance-secondary button-comp--size-l\"]")
+    WebElement specFilterResetButton;
+
+    @FindBy(xpath = "//div[@class=\"filters-controls filters-controls--appearance-search-panel\"]/button[@class=\"" +
+            "button-comp button-comp--appearance-pseudo-link-muted button-comp--size-l\"]")
+    WebElement filterResetButton;
+
+    @FindBy(xpath = "//div[@class=\"specs-selector__group-title\"]/div[contains(text(),\"Quality Assurance\")]")
+    WebElement specFilterQuality;
+
+    @FindBy(xpath = "//label//div[contains(text(),\"Test Automation Engineer\")]")
+    WebElement specFilterTestEngineer;
+
+    @FindBy(xpath = "//label/span[contains(text(),\"Можно удалённо\")]/../..")
+    WebElement specFilterDistCheckbox;
+
+    @FindBy(xpath = "//div[@class=\"vacancy-card__meta\"]/span")
+    List<WebElement> specFilterTypeWorking;
+
     public VacanciesPage(WebDriver driver) {
         super(driver);
     }
@@ -78,12 +96,44 @@ public class VacanciesPage extends Page {
         wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
-    public void specSelectOpen(String input) {
+    public void specSelect(String input) {
         String url = driver.getCurrentUrl();
         specFilterOpen.click();
         specFilterSearch.sendKeys(input);
         specFilterAfterSearch.click();
         specFilterSubmitButton.click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+    }
+
+    public void distCheckbox() {
+        String url = driver.getCurrentUrl();
+        specFilterDistCheckbox.click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+    }
+
+    public void specSelectDiv() {
+        String url = driver.getCurrentUrl();
+        specFilterOpen.click();
+        specFilterQuality.click();
+        specFilterTestEngineer.click();
+        specFilterSubmitButton.click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+    }
+
+    public void specSelectReset() {
+        String url = driver.getCurrentUrl();
+        specFilterOpen.click();
+        specFilterResetButton.click();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+    }
+
+    public void selectReset() {
+        String url = driver.getCurrentUrl();
+        filterResetButton.click();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
         wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
@@ -112,6 +162,14 @@ public class VacanciesPage extends Page {
             strJobNames.add(element.getText().toLowerCase());
         }
         return strJobNames;
+    }
+
+    public List<String> getDist() {
+        List<String> strDist = new ArrayList<>();
+        for (WebElement element : specFilterTypeWorking) {
+                strDist.add(element.getText());
+        }
+        return strDist;
     }
 
     public void searchSalary(String input) {
@@ -190,6 +248,24 @@ public class VacanciesPage extends Page {
             }
         }
         return true;
+    }
+
+    public boolean partlyContains(List<String> a, String s) {
+        for (String str : a) {
+            if (!str.contains(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean partlyContainsDouble(List<Double> a, String s) {
+        for (Double db : a) {
+            if (db < Double.parseDouble(s)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
