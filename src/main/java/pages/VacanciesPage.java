@@ -1,5 +1,7 @@
 package pages;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -78,14 +80,40 @@ public class VacanciesPage extends Page {
     @FindBy(xpath = "//label//div[contains(text(),\"Test Automation Engineer\")]")
     WebElement specFilterTestEngineer;
 
-    @FindBy(xpath = "//label/span[contains(text(),\"Можно удалённо\")]/../..")
+    @FindBy(xpath = "//label/span[contains(text(),\"Можно удалённо\")]/..")
     WebElement specFilterDistCheckbox;
 
     @FindBy(xpath = "//div[@class=\"vacancy-card__meta\"]/span")
     List<WebElement> specFilterTypeWorking;
 
+    @FindBy(xpath = "//div[@class=\"vacancy-card__actions\"]/button")
+    List<WebElement> vacanciesCardToFav;
+
+    @FindBy(xpath = "//div[@class=\"user_panel\"]/div/button[@title=\"Личное меню\"]")
+    WebElement user_avatar;
+
+    @FindBy(xpath = "//div[@class=\"user-menu\"]/div/a[contains(text(),\"Избранные вакансии\")]")
+    WebElement goToFav;
+
+    @FindBy(xpath = "//div[@class=\"header__top_main_menu\"]/a[contains(text(),\"Вакансии\")]")
+    WebElement vacanciesGoTo;
+
     public VacanciesPage(WebDriver driver) {
         super(driver);
+    }
+
+    public void deleteFavourites() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.urlToBe(PropsHandler.get("url_favorites")));
+        String url = driver.getCurrentUrl();
+        if (vacanciesCardToFav.size() != 0) {
+            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//div[@class=\"vacancy-card__actions\"]")));
+            for (WebElement element: vacanciesCardToFav) {
+                element.sendKeys(Keys.ENTER);
+            }
+        }
+        vacanciesGoTo.click();
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
     public void searchJob(String input) {
@@ -93,6 +121,17 @@ public class VacanciesPage extends Page {
         jobFormInput.clear();
         jobFormInput.sendKeys(input);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
+    }
+
+    public void addFavourites() {
+        String url = driver.getCurrentUrl();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        for (WebElement element: vacanciesCardToFav) {
+            element.click();
+        }
+        user_avatar.click();
+        goToFav.click();
         wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
     }
 
@@ -166,6 +205,8 @@ public class VacanciesPage extends Page {
 
     public List<String> getDist() {
         List<String> strDist = new ArrayList<>();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.xpath("//div[@class=\"vacancy-card__meta\"]/span")));
         for (WebElement element : specFilterTypeWorking) {
                 strDist.add(element.getText());
         }
@@ -229,12 +270,14 @@ public class VacanciesPage extends Page {
                 } else {
                     curNum = false;
                 }
-                switch (str) {
-                    case "$" -> numDoubles.add(Double.parseDouble(numbers.get(numbers.size() - 1)) *
+                if (str.equals("$")) {
+                    numDoubles.add(Double.parseDouble(numbers.get(numbers.size() - 1)) *
                             Double.parseDouble(PropsHandler.get("dollar_rate")));
-                    case "€" -> numDoubles.add(Double.parseDouble(numbers.get(numbers.size() - 1)) *
+                } else if (str.equals("€")) {
+                    numDoubles.add(Double.parseDouble(numbers.get(numbers.size() - 1)) *
                             Double.parseDouble(PropsHandler.get("euro_rate")));
-                    case "₽" -> numDoubles.add(Double.parseDouble(numbers.get(numbers.size() - 1)));
+                } else if (str.equals("₽")) {
+                    numDoubles.add(Double.parseDouble(numbers.get(numbers.size() - 1)));
                 }
             }
         }

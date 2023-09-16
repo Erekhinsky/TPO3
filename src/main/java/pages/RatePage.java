@@ -33,10 +33,12 @@ public class RatePage extends Page {
 
     public void selectRateEmp(String select) {
         String url = driver.getCurrentUrl();
-        switch (select) {
-            case "1000 - 5000" -> rateFilterButton1000.click();
-            case "100 - 1000" -> rateFilterButton100.click();
-            case "10 - 100" -> rateFilterButton10.click();
+        if (select.equals("1000 - 5000")) {
+            rateFilterButton1000.click();
+        } else if (select.equals("100 - 1000")) {
+            rateFilterButton100.click();
+        } else if (select.equals("10 - 100")) {
+            rateFilterButton10.click();
         }
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(60));
         wait.until(ExpectedConditions.not(ExpectedConditions.urlToBe(url)));
